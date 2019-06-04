@@ -11,6 +11,7 @@ class Episode:
         self._actions = []
         self._rewards = []
         self._terminal = []
+        self._achieved_goals = []
 
         # numpy array that can be used to directly feed the network
         self._history = []
@@ -22,10 +23,11 @@ class Episode:
         self._env = env
 
 
-    def add_step(self, action, obs, reward, terminal = False):
+    def add_step(self, action, obs, reward, achieved_goal, terminal = False):
         self._actions.append(action)
         self._states.append(obs)
         self._rewards.append(reward)
+        self._achieved_goals.append(achieved_goal)
 
         # if the history is empty, initialize it using the dims of the action
         # and state provided as arguments
@@ -72,6 +74,9 @@ class Episode:
 
     def get_env(self):
         return self._env
+
+    def get_achieved_goals(self):
+        return self._achieved_goals
 
 class ReplayBuffer:
     def __init__(self, buffer_size, random_seed = 0):
