@@ -6,7 +6,7 @@ from environment import RandomizedEnvironment
 from agent import Agent
 from replay_buffer import Episode, ReplayBuffer
 
-EPISODES = 1000
+EPISODES = 1000000
 
 experiment = "FetchReach-v1"
 env = gym.make(experiment)
@@ -55,10 +55,11 @@ for ep in range(EPISODES):
     achieved = current_obs_dict['achieved_goal']
     last_action = env.action_space.sample()
 
-    episode.add_step(last_action, obs, 0, achieved)
+    reward = env.compute_reward(achieved, goal, 0)
+
+    episode.add_step(last_action, obs, reward, achieved)
 
     done = False
-    total_reward = 0
 
     # rollout the  whole episode
     while not done:
