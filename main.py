@@ -76,8 +76,6 @@ for ep in range(EPISODES):
 
         episode.add_step(action[0], new_obs, step_reward, achieved, terminal = done)
 
-        total_reward += step_reward
-
         current_obs_dict = new_obs_dict
 
     # store the episode in the replay buffer
@@ -196,8 +194,6 @@ for ep in range(EPISODES):
                 achieved = new_obs_dict['achieved_goal']
 
                 episode.add_step(action[0], new_obs, step_reward, achieved, terminal=done)
-
-                total_reward += step_reward
 
                 current_obs_dict = new_obs_dict
 
