@@ -20,6 +20,9 @@ class RandomizedEnvironment:
         """
         return self._env, self._params
 
+    def close_env(self):
+        self._env.close()
+
     def get_goal(self):
         return
 
