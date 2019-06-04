@@ -2,7 +2,7 @@ import tensorflow as tf
 import tflearn
 
 UNITS = 128
-MAX_STEPS = 100
+MAX_STEPS = 50
 
 class Critic:
     def __init__(self, session, dim_state, dim_goal, dim_action, dim_env, env, tau, learning_rate, num_actor_vars):
@@ -44,6 +44,8 @@ class Critic:
         self._loss = tflearn.mean_square(self._predicted_q_value, self._net_out)
         self._optimize = tf.train.AdamOptimizer(
             self._learning_rate).minimize(self._loss)
+
+        self._loss_summary = tf.summary.scalar('loss', self._loss)
 
         # Get the gradient of the net w.r.t. the action.
         # For each action in the minibatch (i.e., for each x in xs),

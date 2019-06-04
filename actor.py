@@ -2,7 +2,7 @@ import tensorflow as tf
 import tflearn
 
 UNITS = 128
-MAX_STEPS = 100
+MAX_STEPS = 50
 
 class Actor:
     def __init__(self, session, dim_state, dim_goal, dim_action, env, tau, learning_rate, batch_size):
@@ -89,6 +89,7 @@ class Actor:
 
     def predict_target(self, input_state, input_goal, input_history):
         return self._sess.run(self._target_scaled_out, feed_dict={
+
             self._target_input_state: input_state,
             self._target_input_goal: input_goal,
             self._target_input_history: input_history,

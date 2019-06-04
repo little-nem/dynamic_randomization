@@ -1,54 +1,99 @@
-""" 
-Data structure for implementing experience replay
-
-Author: Patrick Emami
-"""
 from collections import deque
 import random
 import numpy as np
 
-class ReplayBuffer(object):
+class SamplingSizeError(Exception):
+    pass
 
-    def __init__(self, buffer_size, random_seed=123):
-        """
-        The right side of the deque contains the most recent experiences 
-        """
-        self.buffer_size = buffer_size
-        self.count = 0
-        self.buffer = deque()
+class Episode:
+    def __init__(self, goal, env, max_history_timesteps):
+        self._states = []
+        self._actions = []
+        self._rewards = []
+        self._terminal = []
+
+        # numpy array that can be used to directly feed the network
+        self._history = []
+        self._dim_history_atom = 0
+
+        self._max_history_timesteps = max_history_timesteps
+
+        self._goal = goal
+        self._env = env
+
+
+    def add_step(self, action, obs, reward, terminal = False):
+        self._actions.append(action)
+        self._states.append(obs)
+        self._rewards.append(reward)
+
+        # if the history is empty, initialize it using the dims of the action
+        # and state provided as arguments
+        if self._history == []:
+            self._dim_history_atom = action.shape[0] + obs.shape[0]
+            self._history = np.array(self._max_history_timesteps*[np.zeros(self._dim_history_atom)])
+
+        self._history = np.append(self._history, [np.concatenate((action, obs))], axis = 0)[1:]
+        self._terminal.append(terminal)
+
+    def get_history(self, t = -1):
+        # returns the history for calling the actor at step t (if t == -1, return current history)
+        # (ie. history = [a_(t - max_history_timesteps), o_(t - max_history_timesteps), ...,
+        # a_(t-1), o_(t-1)]
+        # zero-padded to use with the lstm
+        if t == -1:
+            return self._history
+        else:
+            history = np.array(self._max_history_timesteps*[np.zeros(self._dim_history_atom)])
+
+            for step in range(max(t - self._max_history_timesteps, 0), t):
+                action = self._actions[step]
+                obs = self._states[step]
+
+                # potential speedup only rewriting the good line instead of creating a new array
+                history = np.append(history, [np.concatenate((action, obs))], axis = 0)[1:]
+
+            return history
+
+    def get_goal(self):
+        return self._goal
+
+    def get_terminal(self):
+        return self._terminal
+
+    def get_actions(self):
+        return self._actions
+
+    def get_states(self):
+        return self._states
+
+    def get_rewards(self):
+        return self._rewards
+
+    def get_env(self):
+        return self._env
+
+class ReplayBuffer:
+    def __init__(self, buffer_size, random_seed = 0):
+        self._buffer_size = buffer_size
+        self._buffer = deque()
+        self._current_count = 0
         random.seed(random_seed)
 
-    def add(self, s, a, r, t, s2, history, env, goal):
-        experience = (s, a, r, t, s2, history, env, goal)
-        if self.count < self.buffer_size: 
-            self.buffer.append(experience)
-            self.count += 1
-        else:
-            self.buffer.popleft()
-            self.buffer.append(experience)
-
     def size(self):
-        return self.count
+        return self._current_count
+
+    def add(self, episode):
+        if self._current_count >= self._buffer_size:
+            self._buffer.popleft()
+            self._current_count -= 1
+
+        self._buffer.append(episode)
+        self._current_count += 1
 
     def sample_batch(self, batch_size):
-        batch = []
+        if batch_size > self._current_count:
+            raise SamplingSizeError
 
-        if self.count < batch_size:
-            batch = random.sample(self.buffer, self.count)
-        else:
-            batch = random.sample(self.buffer, batch_size)
-
-        s_batch = np.array([_[0] for _ in batch])
-        a_batch = np.array([_[1].reshape(4) for _ in batch])
-        r_batch = np.array([_[2] for _ in batch])
-        t_batch = np.array([_[3] for _ in batch])
-        s2_batch = np.array([_[4] for _ in batch])
-        history_batch = np.array([_[5] for _ in batch])
-        env_batch = np.array([_[6] for _ in batch])
-        goal_batch = np.array([_[7] for _ in batch])
-
-        return s_batch, a_batch, r_batch, t_batch, s2_batch, history_batch, env_batch, goal_batch
-
-    def clear(self):
-        self.buffer.clear()
-        self.count = 0
+        return random.sample(self._buffer, batch_size)
+     

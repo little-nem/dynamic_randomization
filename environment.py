@@ -1,4 +1,5 @@
 import gym
+import numpy as np
 
 class RandomizedEnvironment:
     """ Randomized environment class """
@@ -9,7 +10,7 @@ class RandomizedEnvironment:
         self._params = [0]
 
     def sample_env(self):
-        self._params = [0]
+        self._params = np.array([0])
         self._env = gym.make(self._experiment)
         self._env.env.reward_type="dense"        
     def get_env(self):

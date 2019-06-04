@@ -5,7 +5,7 @@ import numpy as np
 from actor import Actor
 from critic import Critic
 
-MAX_STEPS = 100
+MAX_STEPS = 50
 TAU = 1e-3
 LEARNING_RATE = 5e-4
 
@@ -32,11 +32,22 @@ class Agent:
         self._actor.update_target_network()
         self._critic.update_target_network()
 
-        #loss_summary = tf.summary.scalar('loss', self._critic._loss)
         #writer = tf.summary.FileWriter('logs/')
         #writer.add_summary(
         #writer.add_graph(tf.get_default_graph())
         #writer.flush()
+        #
+    def get_dim_state(self):
+        return self._dim_state
+
+    def get_dim_action(self):
+        return self._dim_action
+        
+    def get_dim_env(self):
+        return self._dim_env
+
+    def get_dim_goal(self):
+        return self._dim_goal
 
     def evaluate_actor(self, actor_predict, obs, goal, history):
 
