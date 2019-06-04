@@ -4,6 +4,7 @@ import numpy as np
 
 from actor import Actor
 from critic import Critic
+from noise import OrnsteinUhlenbeckActionNoise
 
 MAX_STEPS = 50
 TAU = 1e-3
@@ -20,7 +21,10 @@ class Agent:
         self._dim_action = self._dummy_env.action_space.shape[0]
         self._dim_env = 1
         self._batch_size = batch_size
-       
+
+        # agent noise
+        self._action_noise = OrnsteinUhlenbeckActionNoise(mu=np.zeros(self._dim_action))
+
         self._actor = Actor(self._sess,
             self._dim_state, self._dim_goal, self._dim_action, self._dummy_env, TAU, LEARNING_RATE, self._batch_size)
 
@@ -89,3 +93,6 @@ class Agent:
 
     def update_target_critic(self):
         self._critic.update_target_network()
+
+    def action_noise(self):
+        return self._action_noise()

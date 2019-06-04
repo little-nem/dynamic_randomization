@@ -62,8 +62,8 @@ for ep in range(EPISODES):
         obs = current_obs_dict['observation']
         history = episode.get_history()
 
-        # TODO: add noise
-        action = agent.evaluate_actor(agent._actor.predict, obs, goal, history)
+        noise = agent.action_noise()
+        action = agent.evaluate_actor(agent._actor.predict, obs, goal, history) + noise
 
         new_obs_dict, step_reward, done, info = env.step(action[0])
 
