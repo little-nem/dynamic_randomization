@@ -33,7 +33,7 @@ class Agent:
         self._critic = Critic(self._sess,
             self._dim_state, self._dim_goal, self._dim_action, self._dim_env, self._dummy_env, TAU, LEARNING_RATE, self._actor.get_num_trainable_vars())
 
-        self._saver = tf.train.Saver()
+        self._saver = tf.train.Saver(max_to_keep=None)
 
         self._sess.run(tf.global_variables_initializer())
 
