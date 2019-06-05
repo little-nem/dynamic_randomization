@@ -6,6 +6,7 @@ from actor import Actor
 from critic import Critic
 from noise import OrnsteinUhlenbeckActionNoise
 
+
 MAX_STEPS = 50
 TAU = 5e-3
 LEARNING_RATE = 1e-3
@@ -15,6 +16,7 @@ class Agent:
         self._dummy_env = gym.make(experiment)
         self._sess = tf.Session()
         
+
         # Hardcoded for now
         self._dim_state = 10
         self._dim_goal = 3
@@ -31,6 +33,8 @@ class Agent:
         self._critic = Critic(self._sess,
             self._dim_state, self._dim_goal, self._dim_action, self._dim_env, self._dummy_env, TAU, LEARNING_RATE, self._actor.get_num_trainable_vars())
 
+        self._saver = tf.train.Saver()
+
         self._sess.run(tf.global_variables_initializer())
 
         self._actor.initialize_target_network()
@@ -46,7 +50,6 @@ class Agent:
 
         self._sum_writer = tf.summary.FileWriter('logs/', self._sess.graph)
 
-        
 
         #writer = tf.summary.FileWriter('logs/')
         #writer.add_summary(
@@ -109,12 +112,12 @@ class Agent:
     def action_noise(self):
         return self._action_noise()
 
-    def checkpoint(self, filename):
-        self._actor.save_model(filename)
-
     def update_success(self, success_rate, step):
         _, result = self._sess.run([self._update_success_rate, self._merged], feed_dict={self._python_success_rate: success_rate})
         self._sum_writer.add_summary(result, step)
 
-    def load_model(self, model_path):
-        self._actor._model.load(model_path)
+    def save_model(self, filename):
+        self._saver.save(self._sess, filename)
+
+    def load_model(self, filename):
+        self._saver.restore(self._sess, filename)

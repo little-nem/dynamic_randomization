@@ -8,7 +8,7 @@ from replay_buffer import Episode
 
 experiment="FetchReach-v1"
 
-MODEL_NAME = "checkpoints/ckpt_episode_0"
+MODEL_NAME = "checkpoints/ckpt_episode_50"
 ROLLOUT_NUMBER = 10
 BATCH_SIZE = 32
 MAX_STEPS = 50
@@ -28,6 +28,7 @@ agent.load_model(MODEL_NAME)
 success_number = 0
 
 for test_ep in range(ROLLOUT_NUMBER):
+    print("Episode {}".format(test_ep))
     randomized_environment.sample_env()
     env, env_params = randomized_environment.get_env()
 
@@ -53,7 +54,6 @@ for test_ep in range(ROLLOUT_NUMBER):
         history = episode.get_history()
 
         if RENDER: env.render()
-
         action = agent.evaluate_actor(agent._actor.predict_target, obs, goal, history)
 
         new_obs_dict, step_reward, done, info = env.step(action[0])
@@ -70,4 +70,4 @@ for test_ep in range(ROLLOUT_NUMBER):
 
     randomized_environment.close_env()
 
-print("Success rate : {}".format(ep, success_number/TESTING_ROLLOUTS))
+print("Success rate : {}".format(success_number/ROLLOUT_NUMBER))

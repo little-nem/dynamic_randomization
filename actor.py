@@ -21,8 +21,6 @@ class Actor:
         self._net_input_state, self._net_input_goal, self._net_input_history = self._net_inputs
         self._network_params = tf.trainable_variables()
 
-        self._model = tflearn.DNN(self._net_scaled_out)
-
         self._target_inputs, self._target_out, self._target_scaled_out = self.create_network()
         self._target_input_state, self._target_input_goal, self._target_input_history = self._target_inputs
 
@@ -45,6 +43,8 @@ class Actor:
         self._optimize = tf.train.AdamOptimizer(self._learning_rate).apply_gradients(zip(self._actor_gradients, self._network_params))
 
         self._num_trainable_vars = len(self._network_params) + len(self._target_network_params)
+
+        self._saver = tf.train.Saver()
 
     def create_network(self):
         input_state = tflearn.input_data(shape=[None, self._dim_state], name='input_state')
@@ -92,7 +92,6 @@ class Actor:
 
     def predict_target(self, input_state, input_goal, input_history):
         return self._sess.run(self._target_scaled_out, feed_dict={
-
             self._target_input_state: input_state,
             self._target_input_goal: input_goal,
             self._target_input_history: input_history,
@@ -106,6 +105,3 @@ class Actor:
 
     def get_num_trainable_vars(self):
         return self._num_trainable_vars
-
-    def save_model(self, filename):
-        self._model.save(filename)

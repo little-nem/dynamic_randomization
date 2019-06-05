@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import random
 import gym
@@ -8,6 +9,7 @@ from replay_buffer import Episode, ReplayBuffer
 
 EPISODES = 1000000
 
+directory = "checkpoints"
 experiment = "FetchReach-v1"
 env = gym.make(experiment)
 
@@ -31,8 +33,8 @@ randomized_environment = RandomizedEnvironment(experiment, [], [])
 # Initialize the replay buffer
 replay_buffer = ReplayBuffer(BUFFER_SIZE)
 
-# should be done per episode
-
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
 for ep in range(EPISODES):
     # generate a rollout
@@ -203,5 +205,5 @@ for ep in range(EPISODES):
             randomized_environment.close_env()
 
         print("Testing at episode {}, success rate : {}".format(ep, success_number/TESTING_ROLLOUTS))
-        agent.checkpoint("checkpoints/ckpt_episode_{}".format(ep))
+        agent.save_model("{}/ckpt_episode_{}".format(directory, ep))
         agent.update_success(success_number/TESTING_ROLLOUTS, ep)
