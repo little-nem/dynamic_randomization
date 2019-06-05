@@ -12,7 +12,7 @@ class RandomizedEnvironment:
     def sample_env(self):
         self._params = np.array([0])
         self._env = gym.make(self._experiment)
-        self._env.env.reward_type="sparse"
+        self._env.env.reward_type="dense"
     def get_env(self):
         """
             Returns a randomized environment and the vector of the parameter
