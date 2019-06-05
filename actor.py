@@ -44,8 +44,6 @@ class Actor:
 
         self._num_trainable_vars = len(self._network_params) + len(self._target_network_params)
 
-        self._saver = tf.train.Saver()
-
     def create_network(self):
         input_state = tflearn.input_data(shape=[None, self._dim_state], name='input_state')
         input_goal = tflearn.input_data(shape=[None, self._dim_goal], name='input_goal')
