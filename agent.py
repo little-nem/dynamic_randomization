@@ -8,7 +8,7 @@ from noise import OrnsteinUhlenbeckActionNoise
 
 MAX_STEPS = 50
 TAU = 1e-3
-LEARNING_RATE = 5e-4
+LEARNING_RATE = 1e-3
 
 class Agent:
     def __init__(self, experiment, batch_size):
@@ -35,6 +35,18 @@ class Agent:
 
         self._actor.update_target_network()
         self._critic.update_target_network()
+
+        # training monitoring
+        self._success_rate = tf.Variable(0., name="success_rate")
+        self._python_success_rate = tf.placeholder("float32", [])
+
+        self._update_success_rate = self._success_rate.assign(self._python_success_rate)
+        self._merged = tf.summary.scalar("successrate", self._update_success_rate)
+        #self._merged = tf.summary.merge(s)
+
+        self._sum_writer = tf.summary.FileWriter('logs/', self._sess.graph)
+
+        
 
         #writer = tf.summary.FileWriter('logs/')
         #writer.add_summary(
@@ -96,3 +108,10 @@ class Agent:
 
     def action_noise(self):
         return self._action_noise()
+
+    def checkpoint(self, filename):
+        self._actor.save_model(filename)
+
+    def update_success(self, success_rate, step):
+        _, result = self._sess.run([self._update_success_rate, self._merged], feed_dict={self._python_success_rate: success_rate})
+        self._sum_writer.add_summary(result, step)

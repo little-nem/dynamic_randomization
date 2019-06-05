@@ -19,8 +19,9 @@ class Actor:
 
         self._net_inputs, self._net_out, self._net_scaled_out = self.create_network()
         self._net_input_state, self._net_input_goal, self._net_input_history = self._net_inputs
-
         self._network_params = tf.trainable_variables()
+
+        self._model = tflearn.DNN(self._net_scaled_out)
 
         self._target_inputs, self._target_out, self._target_scaled_out = self.create_network()
         self._target_input_state, self._target_input_goal, self._target_input_history = self._target_inputs
@@ -100,3 +101,6 @@ class Actor:
 
     def get_num_trainable_vars(self):
         return self._num_trainable_vars
+
+    def save_model(self, filename):
+        self._model.save(filename)

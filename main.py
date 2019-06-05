@@ -13,10 +13,10 @@ env = gym.make(experiment)
 
 # Program hyperparameters
 TESTING_INTERVAL = 50 # number of updates between two evaluation of the policy
-TESTING_ROLLOUTS = 100 # number of rollouts performed to evaluate the current policy
+TESTING_ROLLOUTS = 500 # number of rollouts performed to evaluate the current policy
 
 # Algorithm hyperparameters
-BATCH_SIZE = 32
+BATCH_SIZE = 50
 BUFFER_SIZE = 100000
 MAX_STEPS = 50 # WARNING: defined in multiple files...
 GAMMA = 0.99
@@ -203,3 +203,5 @@ for ep in range(EPISODES):
             randomized_environment.close_env()
 
         print("Testing at episode {}, success rate : {}".format(ep, success_number/TESTING_ROLLOUTS))
+        agent.checkpoint("checkpoints/ckpt_episode_{}".format(ep))
+        agent.update_success(success_number/TESTING_ROLLOUTS, ep)
