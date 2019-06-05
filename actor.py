@@ -28,8 +28,10 @@ class Actor:
 
         self._target_network_params = tf.trainable_variables()[len(self._network_params):]
 
-        # Op for periodically updating target network with online network
-        # weights
+        # op to initialize the target network with the same values as the online network
+        self._initialize_target_network_params = [self._target_network_params[i].assign(self._network_params[i]) for i in range(len(self._target_network_params))]
+
+        # op for periodically updating target network with online network weights
         self._update_target_network_params = [self._target_network_params[i].assign(tf.multiply(self._network_params[i], self._tau) + tf.multiply(self._target_network_params[i], 1. - self._tau)) for i in range(len(self._target_network_params))]
 
         # This gradient will be provided by the critic network
@@ -98,6 +100,9 @@ class Actor:
 
     def update_target_network(self):
         self._sess.run(self._update_target_network_params)
+
+    def initialize_target_network(self):
+        self._sess.run(self._initialize_target_network_params)
 
     def get_num_trainable_vars(self):
         return self._num_trainable_vars

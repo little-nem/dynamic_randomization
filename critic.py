@@ -30,12 +30,18 @@ class Critic:
 
         self._target_network_params = tf.trainable_variables()[(len(self._network_params) + num_actor_vars):]
 
+        # op for initializing the target network with online network weight
+        self._initialize_target_network_params = \
+            [self._target_network_params[i].assign(
+                self._network_params[i]) for i in range(len(self._target_network_params))]
+
         # Op for periodically updating target network with online network
         # weights with regularization
         self._update_target_network_params = \
             [self._target_network_params[i].assign(tf.multiply(self._network_params[i], self._tau) \
             + tf.multiply(self._target_network_params[i], 1. - self._tau))
                 for i in range(len(self._target_network_params))]
+
 
         # Network target (y_i)
         self._predicted_q_value = tf.placeholder(tf.float32, [None, 1])
@@ -126,3 +132,6 @@ class Critic:
 
     def update_target_network(self):
         self._sess.run(self._update_target_network_params)
+
+    def initialize_target_network(self):
+        self._sess.run(self._initialize_target_network_params)

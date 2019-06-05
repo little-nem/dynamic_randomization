@@ -33,8 +33,8 @@ class Agent:
 
         self._sess.run(tf.global_variables_initializer())
 
-        self._actor.update_target_network()
-        self._critic.update_target_network()
+        self._actor.initialize_target_network()
+        self._critic.initialize_target_network()
 
         # training monitoring
         self._success_rate = tf.Variable(0., name="success_rate")

@@ -13,10 +13,10 @@ env = gym.make(experiment)
 
 # Program hyperparameters
 TESTING_INTERVAL = 50 # number of updates between two evaluation of the policy
-TESTING_ROLLOUTS = 500 # number of rollouts performed to evaluate the current policy
+TESTING_ROLLOUTS = 100 # number of rollouts performed to evaluate the current policy
 
 # Algorithm hyperparameters
-BATCH_SIZE = 50
+BATCH_SIZE = 32
 BUFFER_SIZE = 100000
 MAX_STEPS = 50 # WARNING: defined in multiple files...
 GAMMA = 0.99
