@@ -7,7 +7,7 @@ from critic import Critic
 from noise import OrnsteinUhlenbeckActionNoise
 
 MAX_STEPS = 50
-TAU = 1e-3
+TAU = 5e-3
 LEARNING_RATE = 1e-3
 
 class Agent:
@@ -115,3 +115,6 @@ class Agent:
     def update_success(self, success_rate, step):
         _, result = self._sess.run([self._update_success_rate, self._merged], feed_dict={self._python_success_rate: success_rate})
         self._sum_writer.add_summary(result, step)
+
+    def load_model(self, model_path):
+        self._actor._model.load(model_path)
