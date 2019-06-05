@@ -207,3 +207,5 @@ for ep in range(EPISODES):
         print("Testing at episode {}, success rate : {}".format(ep, success_number/TESTING_ROLLOUTS))
         agent.save_model("{}/ckpt_episode_{}".format(directory, ep))
         agent.update_success(success_number/TESTING_ROLLOUTS, ep)
+        with open("csv_log.csv", "a") as csv_log:
+            csv_log.write("{}; {}\n".format(ep, success_number/TESTING_ROLLOUTS))
