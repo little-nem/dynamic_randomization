@@ -19,7 +19,7 @@ TESTING_ROLLOUTS = 100 # number of rollouts performed to evaluate the current po
 
 # Algorithm hyperparameters
 BATCH_SIZE = 32
-BUFFER_SIZE = 100000
+BUFFER_SIZE = 1000
 MAX_STEPS = 50 # WARNING: defined in multiple files...
 GAMMA = 0.99
 K = 0.8 # probability of replay with H.E.R.
