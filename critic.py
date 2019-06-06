@@ -5,7 +5,7 @@ UNITS = 128
 MAX_STEPS = 50
 
 class Critic:
-    def __init__(self, session, dim_state, dim_goal, dim_action, dim_env, env, tau, learning_rate, num_actor_vars):
+    def __init__(self, session, dim_state, dim_goal, dim_action, dim_env, env, tau, learning_rate, num_actor_vars, writer):
         self._sess = session
 
         self._dim_state = dim_state
@@ -16,6 +16,7 @@ class Critic:
 
         self._learning_rate = learning_rate
         self._tau = tau
+        self._sum_writer = writer
 
 
         self._net_inputs, self._net_out = self.create_network()
@@ -48,8 +49,10 @@ class Critic:
 
         # Define loss and optimization Op
         self._loss = tflearn.mean_square(self._predicted_q_value, self._net_out)
-        self._optimize = tf.train.AdamOptimizer(
-            self._learning_rate).minimize(self._loss)
+        self._grad = tf.gradients(self._loss, self._network_params)
+        self._optimize = tf.train.AdamOptimizer(self._learning_rate).apply_gradients(zip(self._grad, self._network_params))
+        #self._optimize = tf.train.AdamOptimizer(
+        #    self._learning_rate).minimize(self._loss)
 
         self._loss_summary = tf.summary.scalar('loss', self._loss)
 
@@ -93,7 +96,7 @@ class Critic:
 
 
     def train(self, input_env, input_state, input_goal, input_action, input_history, predicted_q_value):
-        return self._sess.run([self._net_out, self._optimize], feed_dict={
+        net_out, optimize, summary = self._sess.run([self._net_out, self._optimize, self._loss_summary], feed_dict={
             self._net_input_env: input_env,
             self._net_input_state:  input_state,
             self._net_input_goal:  input_goal,
@@ -102,6 +105,8 @@ class Critic:
 
             self._predicted_q_value: predicted_q_value
         })
+        self._sum_writer.add_summary(summary)
+        return net_out, optimize
 
     def predict(self, input_env, input_state, input_goal, input_action, input_history):
         return self._sess.run(self._net_out, feed_dict={

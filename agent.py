@@ -16,6 +16,7 @@ class Agent:
         self._dummy_env = gym.make(experiment)
         self._sess = tf.Session()
         
+        self._sum_writer = tf.summary.FileWriter('logs/', self._sess.graph)
 
         # Hardcoded for now
         self._dim_state = 10
@@ -31,7 +32,7 @@ class Agent:
             self._dim_state, self._dim_goal, self._dim_action, self._dummy_env, TAU, LEARNING_RATE, self._batch_size)
 
         self._critic = Critic(self._sess,
-            self._dim_state, self._dim_goal, self._dim_action, self._dim_env, self._dummy_env, TAU, LEARNING_RATE, self._actor.get_num_trainable_vars())
+            self._dim_state, self._dim_goal, self._dim_action, self._dim_env, self._dummy_env, TAU, LEARNING_RATE, self._actor.get_num_trainable_vars(), self._sum_writer)
 
         self._saver = tf.train.Saver(max_to_keep=None)
 
@@ -47,8 +48,6 @@ class Agent:
         self._update_success_rate = self._success_rate.assign(self._python_success_rate)
         self._merged = tf.summary.scalar("successrate", self._update_success_rate)
         #self._merged = tf.summary.merge(s)
-
-        self._sum_writer = tf.summary.FileWriter('logs/', self._sess.graph)
 
 
         #writer = tf.summary.FileWriter('logs/')
