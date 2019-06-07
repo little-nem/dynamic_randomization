@@ -12,6 +12,7 @@ class RandomizedEnvironment:
         self._parameter_ranges = parameter_ranges
         self._goal_range = goal_range
         self._params = [0]
+        random.seed(123)
 
     def sample_env(self):
         mini = self._parameter_ranges[0]
@@ -21,7 +22,7 @@ class RandomizedEnvironment:
         self._params = np.array([pick])
         self._env = gym.make(self._experiment)
         self._env.env.reward_type="dense"
-        self._env.set_property('object0', 'geom_friction', [pick])
+        self._env.set_property('object0', 'geom_friction', [pick, 0.005, .0001])
     def get_env(self):
         """
             Returns a randomized environment and the vector of the parameter
