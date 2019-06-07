@@ -1,0 +1,1 @@
+from fetch_slide_2.envs.fetch_slide_2_env import FetchSlide2
