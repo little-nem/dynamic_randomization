@@ -6,31 +6,35 @@ from environment import RandomizedEnvironment
 from agent import Agent
 from replay_buffer import Episode
 
-experiment="FetchReach-v1"
+import fetch_slide_2
 
-MODEL_NAME = "checkpoints/ckpt_episode_50"
-ROLLOUT_NUMBER = 10
+experiment="FetchSlide2-v1"
+
+MODEL_NAME = "checkpoints/ckpt_episode_0"
+ROLLOUT_NUMBER = 100
 BATCH_SIZE = 32
 MAX_STEPS = 50
 
 
-RENDER = False
+RENDER = True
 
 # initialize the agent, both the actor/critic (and target counterparts) networks
 agent = Agent(experiment, BATCH_SIZE*MAX_STEPS)
 
 # initialize the environment sampler
-randomized_environment = RandomizedEnvironment(experiment, [], [])
+randomized_environment = RandomizedEnvironment(experiment, [0.0, 1.0], [])
 
 # load the wanted model
 agent.load_model(MODEL_NAME)
 
 success_number = 0
 
+randomized_environment.sample_env()
+env, env_params = randomized_environment.get_env()
+
 for test_ep in range(ROLLOUT_NUMBER):
     print("Episode {}".format(test_ep))
-    randomized_environment.sample_env()
-    env, env_params = randomized_environment.get_env()
+
 
     current_obs_dict = env.reset()
 
@@ -68,6 +72,6 @@ for test_ep in range(ROLLOUT_NUMBER):
     if info['is_success'] > 0.0:
         success_number += 1
 
-    randomized_environment.close_env()
+    #randomized_environment.close_env()
 
 print("Success rate : {}".format(success_number/ROLLOUT_NUMBER))

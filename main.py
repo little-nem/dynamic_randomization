@@ -10,7 +10,7 @@ from replay_buffer import Episode, ReplayBuffer
 EPISODES = 1000000
 
 directory = "checkpoints"
-experiment = "FetchReach-v1"
+experiment = "FetchSlide2-v1"
 env = gym.make(experiment)
 
 # Program hyperparameters
@@ -28,7 +28,7 @@ K = 0.8 # probability of replay with H.E.R.
 agent = Agent(experiment, BATCH_SIZE*MAX_STEPS)
 
 # Initialize the environment sampler
-randomized_environment = RandomizedEnvironment(experiment, [], [])
+randomized_environment = RandomizedEnvironment(experiment, [0.0, 1.0], [])
 
 # Initialize the replay buffer
 replay_buffer = ReplayBuffer(BUFFER_SIZE)
