@@ -19,7 +19,7 @@ class Agent:
         self._sum_writer = tf.summary.FileWriter('logs/', self._sess.graph)
 
         # Hardcoded for now
-        self._dim_state = 10
+        self._dim_state = 25
         self._dim_goal = 3
         self._dim_action = self._dummy_env.action_space.shape[0]
         self._dim_env = 1

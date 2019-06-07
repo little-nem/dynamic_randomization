@@ -56,6 +56,9 @@ class Critic:
 
         self._loss_summary = tf.summary.scalar('loss', self._loss)
 
+        self._gradients_summaries = [tf.summary.scalar("gradient_{}".format(i), grad) for i, grad in zip(range(1000), [tf.norm(gr) for gr in self._grad])]
+        self._merged_gradients = tf.summary.merge(self._gradients_summaries) 
+
         # Get the gradient of the net w.r.t. the action.
         # For each action in the minibatch (i.e., for each x in xs),
         # this will sum up the gradients of each critic output in the minibatch
@@ -96,7 +99,7 @@ class Critic:
 
 
     def train(self, input_env, input_state, input_goal, input_action, input_history, predicted_q_value):
-        net_out, optimize, summary = self._sess.run([self._net_out, self._optimize, self._loss_summary], feed_dict={
+        net_out, optimize, loss_summary, gradients_summaries = self._sess.run([self._net_out, self._optimize, self._loss_summary, self._merged_gradients], feed_dict={
             self._net_input_env: input_env,
             self._net_input_state:  input_state,
             self._net_input_goal:  input_goal,
@@ -105,7 +108,8 @@ class Critic:
 
             self._predicted_q_value: predicted_q_value
         })
-        self._sum_writer.add_summary(summary)
+        self._sum_writer.add_summary(loss_summary)
+        self._sum_writer.add_summary(gradients_summaries)
         return net_out, optimize
 
     def predict(self, input_env, input_state, input_goal, input_action, input_history):
