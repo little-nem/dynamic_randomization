@@ -14,7 +14,7 @@ experiment = "FetchSlide2-v1"
 env = gym.make(experiment)
 
 # Program hyperparameters
-TESTING_INTERVAL = 50 # number of updates between two evaluation of the policy
+TESTING_INTERVAL = 200 # number of updates between two evaluation of the policy
 TESTING_ROLLOUTS = 100 # number of rollouts performed to evaluate the current policy
 
 # Algorithm hyperparameters
